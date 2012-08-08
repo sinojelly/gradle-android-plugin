@@ -111,7 +111,7 @@ class AndroidSignAndAlignTask extends DefaultTask {
 
   private void signWithDebugKey() {
     logger.info("Signing final apk with debug key...")
-
+    
     project.ant.signjar(
         jar: unsignedArchivePath.absolutePath,
         signedjar: buildUnalignedArchivePath().absolutePath,

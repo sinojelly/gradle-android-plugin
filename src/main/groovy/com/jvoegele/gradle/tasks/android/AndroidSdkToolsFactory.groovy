@@ -47,7 +47,12 @@ class AndroidSdkToolsFactory {
       def sourcePropertiesFile = new File(toolsDir, SOURCE_PROPERTIES_FILE)
       assert sourcePropertiesFile.exists()
       ant.property(file: sourcePropertiesFile)
-      toolsRevision = Integer.parseInt(ant[PKG_REVISION_PROPERTY])
+      def revisionPropertyBeforeFirstDot = ant[PKG_REVISION_PROPERTY]
+      def firstDotIndex = revisionPropertyBeforeFirstDot.indexOf('.')
+      if (firstDotIndex > 0) {
+        revisionPropertyBeforeFirstDot = revisionPropertyBeforeFirstDot[0..firstDotIndex-1]
+      }
+      toolsRevision = Integer.parseInt(revisionPropertyBeforeFirstDot)
     }
 
     return toolsRevision
@@ -74,8 +79,10 @@ class AndroidSdkToolsFactory {
       return new AaptExecTask_r7(project)
     } else if (this.androidSdkToolsRevision < 14) {
       return new AaptExecTask_r8(project)
-    } else {
+    } else if (this.androidSdkToolsRevision < 18) {
       return new AaptExecTask_r14(project)
+    } else {
+      return new AaptExecTask_r18(project)
     }
   }
 }
