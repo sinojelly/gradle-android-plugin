@@ -45,13 +45,15 @@ uploadArchives {
 
       def repositoryUsername = project.hasProperty('sonatypeUsername') ? sonatypeUsername : ''
       def repositoryPassword = project.hasProperty('sonatypePassword') ? sonatypePassword : ''
+      def repositoryURLRelease = project.hasProperty('sonatypeReleaseRepository') ? sonatypeReleaseRepository : 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
+      def repositoryURLSnapshot = project.hasProperty('sonatypeSnapshotRepository') ? sonatypeSnapshotRepository : 'https://oss.sonatype.org/content/repositories/snapshots'
 
       if (isReleaseVersion) {
-        repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2') {
+        repository(url: repositoryURLRelease) {
           authentication(userName: repositoryUsername, password: repositoryPassword)
         }
       } else {
-        repository(url: 'https://oss.sonatype.org/content/repositories/snapshots') {
+        repository(url: repositoryURLSnapshot) {
           authentication(userName: repositoryUsername, password: repositoryPassword)
         }
       }
@@ -59,6 +61,19 @@ uploadArchives {
       pom.project(pomConfiguration)
     }
   }
+}
+
+import org.gradle.plugins.signing.Sign
+gradle.taskGraph.whenReady { taskGraph ->
+    if (taskGraph.hasTask(uploadArchives) && !project.hasProperty("signing.password")) {
+        Console console = System.console()
+        console.printf "\n\nWe have to sign some things in this build.\n\nPlease enter your signing details.\n\n"
+
+        def password = console.readPassword("PGP Private Key Password: ")
+        allprojects { ext."signing.password" = password }
+
+        console.printf "\nThanks.\n\n"
+    }
 }
 
 dependencies {
@@ -147,7 +162,7 @@ signing {
 }
 
 task wrapper(type: Wrapper) {
-  gradleVersion = '1.0-rc-3'
+  gradleVersion = '1.0'
 }
 
 task generatePom << {

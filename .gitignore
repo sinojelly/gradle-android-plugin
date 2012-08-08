@@ -10,4 +10,5 @@ bin
 *.ipr
 *.iws
 out
+gradle.properties
 jarlist.cache
