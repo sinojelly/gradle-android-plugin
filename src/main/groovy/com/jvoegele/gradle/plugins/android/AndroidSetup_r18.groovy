@@ -29,9 +29,9 @@ class AndroidSetup_r18 extends AbstractAndroidSetup {
     def toolsDir = new File(sdkDir, "tools")
     def platformToolsDir = new File(sdkDir, "platform-tools")
 
-    println "sdkDir = ${sdkDir}";
-    println "toolsDir = ${toolsDir}";
-    println "platformToolsDir = ${platformToolsDir}";
+    project.logger.info("sdkDir = ${sdkDir}");
+    project.logger.info("toolsDir = ${toolsDir}");
+    project.logger.info("platformToolsDir = ${platformToolsDir}");
 
     ant.condition('property': "exe", value: ".exe", 'else': "") { os(family: "windows") }
     ant.condition('property': "bat", value: ".bat", 'else': "") { os(family: "windows") }
@@ -90,6 +90,7 @@ class AndroidSetup_r18 extends AbstractAndroidSetup {
     );
 
     ant.property(name: "aapt", location: new File(platformToolsDir, "aapt${ant['exe']}"))
+    ant.property(name: "aidl", location: new File(platformToolsDir, "aidl${ant['exe']}"))
     ant.property(name: "dx", location: new File(platformToolsDir, "dx${ant['bat']}"))
     ant.property(name: "renderscript", location: new File(platformToolsDir, "llvm-rs-cc${ant['bat']}"))
 
@@ -99,7 +100,7 @@ class AndroidSetup_r18 extends AbstractAndroidSetup {
     ant.path(id: "android.renderscript.include.path") {
       pathelement(location:"${ant['android.platform.tools.dir']}/renderscript/include");
       pathelement(location:"${ant['android.platform.tools.dir']}/renderscript/clang-include");
-	};
+  };
 
     ant.xpath(input: androidConvention.androidManifest, expression: "/manifest/@package", output: "manifest.package")
     // TODO: there can be several instrumentations defined
@@ -113,4 +114,3 @@ class AndroidSetup_r18 extends AbstractAndroidSetup {
     }
   }
 }
-
